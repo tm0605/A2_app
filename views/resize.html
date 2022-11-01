@@ -14,39 +14,8 @@
     </form>
     <h2></h2>
     <h3></h3>
-
-    <script>
-        const form = document.getElementById("uploadForm");
-
-        const sendFiles = async () => {
-            const files = document.getElementById("inputFiles").files;
-
-            const formData = new FormData();
-
-            Object.keys(files).forEach(key => {
-                formData.append(files.item(key).name, files.item(key))
-            })
-
-            const response = await fetch('/upload', {
-                method: "POST",
-                body: formData
-            })
-
-            const json = await response.json()
-
-            const h2 = document.querySelector('h2')
-            h2.textContent = `Status: ${json?.status}`
-
-            const h3 = document.querySelector('h3')
-            h3.textContent = json?.message
-
-            console.log(json)
-        }
-
-        form.addEventListener('submit', (e) => {
-            e.preventDefault()
-            sendFiles()
-        })
-    </script>
+    <p></p>
+    
+    <script type="text/javascript" src="/javascripts/imageUpload.js"></script>
 </body>
 </html>

@@ -27,6 +27,9 @@ const sendFiles = async () => {
     const p = document.querySelector('p')
     p.textContent = `${timing} ms`
 
+    const img = document.querySelector('img')
+    img.src = `data:image/jpeg;base64,${json?.message[0]}`
+
     console.log(json)
 }
 

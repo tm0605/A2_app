@@ -4,9 +4,10 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const fileUpload = require('express-fileupload');
-const sharp = require('sharp');
 
 const fileExists = require('./middleware/fileExists');
+const photoEdit = require('./middleware/photoEdit');
+const base64Conversion = require('./middleware/base64Conversion')
 const { type } = require('os');
 // var indexRouter = require('./routes/index');
 // var usersRouter = require('./routes/users');
@@ -38,46 +39,11 @@ app.get('/resize', function(req, res) {
 app.post('/upload', 
   fileUpload({ createParentPath: true }),
   fileExists,
+  photoEdit,
+  base64Conversion,
   (req, res) => {
-    // let start = Date.now();
-    var files = req.files.photos
-    if (!(files instanceof Array)) { // If single photo add it in an array
-      files = [files];
-    }
-
-    Object.keys(files).forEach(async key => { // For each photo object in files array
-      // console.log(files[key].data)
-      // photos[key] = files[key]
-      const name = files[key].name
-      const info = await sharp(files[key].data)
-        .greyscale()
-        .jpeg()
-        .toFile(`images/test${key}.jpeg`);
-      const scaleHalf = await sharp(files[key].data)
-        .metadata()
-        .then(({ width }) => sharp(files[key].data)
-          .resize(Math.round(width * 0.5))
-          // .toBuffer()
-          .toFile(`images/testscalehalf${key}.jpeg`)
-          /* .then(function(outputBuffer) {
-            // outputBuffer contains image data
-          }) */);
-      const scale = await sharp(files[key].data)
-        .resize({ width: 100 })
-        .toBuffer()
-        .then(data => {
-          console.log(data)
-          // 100 px wide, auto scale hight
-        })
-      // console.log(info)
-      // console.log(scaleHalf)
-      // console.log(scale)
-    })
-    // let timing = Date.now() - start;
-
-    // console.log(photos)
-
-    return res.json({ status: 'logged', message: files })
+    console.log(req.photos);
+    return res.json({ status: 'logged', message: req.photos })
   }
 )
 

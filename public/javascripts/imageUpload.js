@@ -21,14 +21,21 @@ const sendFiles = async () => {
     const h2 = document.querySelector('h2')
     h2.textContent = `Status: ${json?.status}`
 
-    const h3 = document.querySelector('h3')
-    h3.textContent = json?.message
+    // const h3 = document.querySelector('h3')
+    // h3.textContent = json?.message
 
     const p = document.querySelector('p')
     p.textContent = `${timing} ms`
 
-    const img = document.querySelector('img')
-    img.src = `data:image/jpeg;base64,${json?.message[0]}`
+    // const img = document.querySelector('img')
+    // img.src = `data:image/jpeg;base64,${json?.message[0]}`
+
+    for (let n = 0; n < json?.message.length; ++n) {
+        // const img = document.createElement('img');
+        const img = new Image(200)
+        img.src = `data:image/jpeg;base64,${json?.message[n]}`;
+        document.body.append(img);
+    }
 
     console.log(json)
 }

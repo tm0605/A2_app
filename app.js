@@ -42,8 +42,8 @@ app.post('/upload',
   photoEdit,
   base64Conversion,
   (req, res) => {
-    console.log(req.photos);
-    return res.json({ status: 'logged', message: req.photos })
+    // console.log(req.photos);
+    return res.json({ status: 'logged', message: req.b64Photos })
   }
 )
 

@@ -9,7 +9,14 @@
 <body>
     <h1>Upload Photos</h1>
     <form id="uploadForm" enctype="multipart/form-data">
-        <input type="file" id="inputFiles" accept="image/*" multiple />
+        <input type="file" id="inputFiles" accept="image/*" multiple required/>
+        <select name="processing" id="processing" required>
+            <option value="" disabled selected>Choose processing</option>
+            <option value="resize">Resize to half</option>
+            <option value="grayscale"> Grayscale</option>
+            <option value="sharpen">Sharpen</option>
+            <option value="blur">Blur</option>
+        </select>
         <button type="submit">Upload</button>
     </form>
     <h2></h2>

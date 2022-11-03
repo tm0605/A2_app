@@ -24,7 +24,7 @@ const sendFiles = async () => {
     // const h3 = document.querySelector('h3')
     // h3.textContent = json?.message
 
-    const p = document.querySelector('p')
+    const p = document.querySelector('p') // Update p tag 
     p.textContent = `${timing} ms`
 
     // const img = document.querySelector('img')
@@ -32,9 +32,13 @@ const sendFiles = async () => {
 
     for (let n = 0; n < json?.message.length; ++n) {
         // const img = document.createElement('img');
-        const img = new Image(200)
+        const img = new Image(500) // Create image
         img.src = `data:image/jpeg;base64,${json?.message[n]}`;
-        document.body.append(img);
+        document.body.append(img); // Append in html
+        const button = document.createElement('button'); // Add Download button under each photo
+        button.setAttribute('type', 'submit')
+        button.textContent = 'Download'
+        document.body.append(button) // Append in html
     }
 
     console.log(json)

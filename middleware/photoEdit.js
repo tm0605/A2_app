@@ -7,6 +7,7 @@ const photoEdit = (req, res, next) => {
     if (!(files instanceof Array)) { // If single photo add it in an array
         files = [files];
     }
+    // console.log(files)
 
     var photos = [];
     var px = 100;
@@ -19,31 +20,45 @@ const photoEdit = (req, res, next) => {
         req.gsPhotos = photos;
         photos = [];
         start = Date.now();
-        resizeByPixel(files, px)
-        .then(() => {
-            time = Date.now() - start;
-            console.log(`resize by pixel of ${px} processing: ${time}ms`);
-            req.resizeByPixel = photos;
-            photos = [];
-            start = Date.now();
-            resizeByRatio(files, ratio)
-            .then(() => {
-                time = Date.now() - start;
-                console.log(`resize by ratio of ${ratio} processing: ${time}ms`)
-                req.resizeByRatio = photos;
-                photos = [];
-                start = Date.now();
+        // resizeByPixel(files, px)
+        // .then(() => {
+        //     time = Date.now() - start;
+        //     console.log(`resize by pixel of ${px} processing: ${time}ms`);
+        //     req.resizeByPixel = photos;
+        //     photos = [];
+        //     start = Date.now();
+            // resizeByRatio(files, ratio)
+            // .then(() => {
+            //     time = Date.now() - start;
+            //     console.log(`resize by ratio of ${ratio} processing: ${time}ms`)
+            //     req.resizeByRatio = photos;
+            //     photos = [];
+            //     start = Date.now();
                 resizeHalf(files)
                 .then(() => {
                     time = Date.now() - start;
                     console.log(`resize half processing: ${time}ms`);
                     req.resizeHalf = photos;
                     photos = [];
-                    next();
+                    normalize(files)
+                    .then(() => {
+                        time = Date.now() - start;
+                        console.log(`normalize processing: ${time}ms`);
+                        req.sharpen = photos;
+                        photos = [];
+                        blur(files)
+                        .then(() => {
+                            time = Date.now() - start;
+                            console.log(`blur processing: ${time}ms`);
+                            req.blur = photos;
+                            photos = [];
+                            next();
+                        })
+                    })
                 })
-            })
+            // })
 
-        })
+        // })
     })
 
     function greyscale(photoset) {
@@ -133,6 +148,46 @@ const photoEdit = (req, res, next) => {
             }
         })
 
+    }
+
+    function normalize(photoset) {
+        return new Promise((resolve, reject) => {
+            console.log('starting sharpen process')
+            for (let n = 0; n < photoset.length; ++n) {
+                const image = sharp(photoset[n].data);
+                image.sharpen({ sigma: 20 })
+                .toBuffer()
+                .then((data) => {
+                    photos.push(data)
+                    if (n == photoset.length - 1) {
+                        resolve();
+                    }
+                })
+                .catch((error) => {
+                    console.log(error);
+                })
+            }
+        })
+    }
+
+    function blur(photoset) {
+        return new Promise((resolve, reject) => {
+            console.log('starting blur process')
+            for (let n = 0; n < photoset.length; ++n) {
+                const image = sharp(photoset[n].data);
+                image.blur(20)
+                .toBuffer()
+                .then((data) => {
+                    photos.push(data);;
+                    if (n == photoset.length - 1) {
+                        resolve();
+                    }
+                })
+                .catch((error) => {
+                    console.log(error);
+                })
+            }
+        })
     }
 }
 

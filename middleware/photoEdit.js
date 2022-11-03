@@ -43,7 +43,7 @@ const photoEdit = (req, res, next) => {
                     normalize(files)
                     .then(() => {
                         time = Date.now() - start;
-                        console.log(`normalize processing: ${time}ms`);
+                        console.log(`sharpen processing: ${time}ms`);
                         req.sharpen = photos;
                         photos = [];
                         blur(files)

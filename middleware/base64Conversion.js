@@ -3,20 +3,36 @@ const base64Conversion = (req, res, next) => {
     const b64Photos = []
     const output = []
 
-    convLoop(req.gsPhotos)
+    // convLoop(req.gsPhotos) // Convert all photos
+    // .then(() => {
+    //     convLoop(req.sharpen)
+    //     .then(() => {
+    //         convLoop(req.blur)
+    //         .then(() => {
+    //             convLoop(req.resizeHalf)
+    //             .then(() => {
+    //                 req.b64Photos = b64Photos;
+    //                 next();
+    //             })
+    //         })
+    //     })
+    // })
+    
+    b64Conv(req.gsPhotos[0]) // Convert only first photo
     .then(() => {
-        convLoop(req.sharpen)
+        b64Conv(req.sharpen[0])
         .then(() => {
-            convLoop(req.blur)
+            b64Conv(req.blur[0])
             .then(() => {
-                convLoop(req.resizeHalf)
+                b64Conv(req.resizeHalf[0])
                 .then(() => {
-                    req.b64Photos = b64Photos;
+                    req.b64Photos = b64Photos; // Assign to req.b64Photos
                     next();
                 })
             })
         })
     })
+
 
     function convLoop(photoset) {
         return new Promise((resolve, reject) => {

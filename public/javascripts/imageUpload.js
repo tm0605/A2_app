@@ -35,10 +35,13 @@ const sendFiles = async () => {
         const img = new Image(500) // Create image
         img.src = `data:image/jpeg;base64,${json?.message[n]}`;
         document.body.append(img); // Append in html
+        const newLine = document.createElement('br');
+        document.body.append(newLine);
         const button = document.createElement('button'); // Add Download button under each photo
         button.setAttribute('type', 'submit')
         button.textContent = 'Download'
         document.body.append(button) // Append in html
+        document.body.append(newLine);
     }
 
     console.log(json)

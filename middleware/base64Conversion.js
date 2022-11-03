@@ -1,10 +1,15 @@
 const base64Conversion = (req, res, next) => {
     const bufPhotos = req.gsPhotos;
     const b64Photos = []
+    const output = []
 
-    convLoop(bufPhotos)
+    convLoop(req.gsPhotos)
     .then(() => {
         req.b64Photos = b64Photos;
+        convLoop(req.resizeByPixel)
+        .then(() => {
+            // req.
+        })
         next();
     })
 

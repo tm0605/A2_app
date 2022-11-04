@@ -2,6 +2,20 @@ const form = document.getElementById("uploadForm");
 var element = false;
 
 const sendFiles = async () => {
+  let insertHtml = `
+<!-- loading -->
+<div id="loading" class="is-hide">
+    <div class="cv-spinner">
+        <span class="spinner"></span>
+        <p id="loadingletter">Now loading...</p>
+    </div>
+</div>
+<!-- loading -->
+`;
+  document
+    .getElementsByTagName("body")[0]
+    .insertAdjacentHTML("afterbegin", insertHtml);
+  showLoading();
   if (element) {
     var rmelement = document.getElementsByClassName("inline");
     var len = rmelement.length;
@@ -81,9 +95,19 @@ const sendFiles = async () => {
   }
 
   console.log(json);
+  console.log(document.getElementsByTagName("body")[0]);
+  hideLoading();
 };
 
 form.addEventListener("submit", (e) => {
   e.preventDefault();
   sendFiles();
 });
+
+function showLoading() {
+  document.getElementById("loading").classList.remove("is-hide");
+}
+
+function hideLoading() {
+  document.getElementById("loading").remove();
+}

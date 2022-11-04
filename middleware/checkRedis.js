@@ -17,7 +17,6 @@ const checkRedis = (req, res, next) => {
 
   var files = req.files.photos;
   var processing = req.query.processing;
-  const processes = ['greyscale', 'resize', 'sharpen', 'blur'];
 
   if (!(files instanceof Array)) {
     // If single photo add it in an array
@@ -29,93 +28,87 @@ const checkRedis = (req, res, next) => {
   console.log('checking redis...');
   var found = 0;
   var missing = 0
-  if (processing == 'all') {
-    for (let n = 0; n < processes.length; ++n) {
-      processing = processes[n];
-      console.log(processing);
-      scan()
-      .then(() => {
-        if (n == processes.length - 1) {
-          req.saved = saved;
-          add(n)
-          .then(() => {
-            if (n == processes.length - 1) {
-              next();
+  scan(processing, files)
+  .then(() => {
+    req.saved = saved;
+    add(processing, files)
+    .then(() => {
+      next();
+    })
+  })
+
+  function scan(processing) {
+    return new Promise((resolve, reject) => {
+      
+      const processes = ['greyscale', 'resize', 'sharpen', 'blur'];
+      for (let p = 0; p < processes.length; ++p) {
+        if (processing != 'all' && p == 0) {
+          p = processes.length - 1;
+        }
+        else {
+          processing = processes[p];
+        }
+        for (let n = 0; n < files.length; ++n) {
+          var hash = files[n].md5;
+          var redisKey = processing + "_" + hash;
+          // console.log("redisKey: ", redisKey);
+          redisClient
+          .get(redisKey)
+          .then((result) => {
+            //Redisから引っ張ってくる
+            if (result) {
+              console.log(`image ${n}: ${result}`);
+              found++;
+              saved.push(true);
+            } else {
+              console.log(`image ${n}: not found`);
+              missing++;
+              saved.push(false);
             }
           })
+          .then(() => {
+            if (n == files.length - 1 && p == processes.length - 1) {
+              console.log('redis check done');
+              console.log(`found: ${found} missing: ${missing}`)
+              
+              resolve();
+            }
+          });
         }
-      });
-    }
-  }
-  else {
-    scan()
-    .then(() => {
-      req.saved = saved;
-      add(0)
-      .then(() => {
-        next();
-      })
-    })
-  }
-
-  function scan() {
-    return new Promise((resolve, reject) => {
-      for (let n = 0; n < files.length; ++n) {
-        var hash = files[n].md5;
-        var redisKey = processing + "_" + hash;
-        console.log("redisKey: ", redisKey);
-        redisClient
-        .get(redisKey)
-        .then((result) => {
-          //Redisから引っ張ってくる
-          if (result) {
-            console.log(`image ${n}: ${result}`);
-            found++;
-            saved.push(true);
-          } else {
-            console.log(`image ${n}: no result`);
-            missing++;
-            saved.push(false);
-          }
-        })
-        .then(() => {
-          if (n == files.length - 1) {
-            console.log('redis check done');
-            console.log(`found: ${found} missing: ${missing}`)
-            
-            resolve();
-          }
-        });
+        
       }
+      
     })
     
   }
 
-  function add(startIndex) {
+  function add(processing) {
     return new Promise((resolve, reject) => {
-      // const endIndex = startIndex + files.length - 1;
-      for (let n = 0; n < files.length; ++n) {
-        if (!saved[n + startIndex * files.length]) {
-          // console.log(saved)
-          console.log(n + startIndex * files.length)
+      
+      const processes = ['greyscale', 'resize', 'sharpen', 'blur'];
+      for (let p = 0; p < processes.length; ++p) {
+        if (processing != 'all' && p == 0) {
+          p = processes.length - 1;
+        }
+        else {
+          processing = processes[p];
+          // console.log(processing);
+        }
+
+        for (let n = 0; n < files.length; ++n) {
           var hash = files[n].md5;
           var redisKey = processing + "_" + hash;
+          console.log(`${redisKey} uploaded to redis`);
           redisClient.setEx(
             redisKey,
             3600,
             hash
           )
           .then(() => {
-            console.log(`${redisKey} uploaded to redis`);
-            if (n == files.length - 1) {
+            if (n == files.length - 1 && p == processes.length - 1) {
               resolve();
             }
           })
-        }
-        else {
-          if (n == files.length - 1) {
-            resolve();
-          }
         }
       }
     })

@@ -32,11 +32,17 @@ const checkRedis = (req, res, next) => {
   if (processing == 'all') {
     for (let n = 0; n < processes.length; ++n) {
       processing = processes[n];
+      console.log(processing);
       scan()
       .then(() => {
         if (n == processes.length - 1) {
           req.saved = saved;
-          next();
+          add(n)
+          .then(() => {
+            if (n == processes.length - 1) {
+              next();
+            }
+          })
         }
       });
     }
@@ -45,8 +51,10 @@ const checkRedis = (req, res, next) => {
     scan()
     .then(() => {
       req.saved = saved;
-      console.log(saved);
-      next();
+      add(0)
+      .then(() => {
+        next();
+      })
     })
   }
 
@@ -81,6 +89,36 @@ const checkRedis = (req, res, next) => {
       }
     })
     
+  }
+
+  function add(startIndex) {
+    return new Promise((resolve, reject) => {
+      // const endIndex = startIndex + files.length - 1;
+      for (let n = 0; n < files.length; ++n) {
+        if (!saved[n + startIndex * files.length]) {
+          // console.log(saved)
+          console.log(n + startIndex * files.length)
+          var hash = files[n].md5;
+          var redisKey = processing + "_" + hash;
+          redisClient.setEx(
+            redisKey,
+            3600,
+            hash
+          )
+          .then(() => {
+            console.log(`${redisKey} uploaded to redis`);
+            if (n == files.length - 1) {
+              resolve();
+            }
+          })
+        }
+        else {
+          if (n == files.length - 1) {
+            resolve();
+          }
+        }
+      }
+    })
   }
 
 };

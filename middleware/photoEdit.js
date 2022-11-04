@@ -1,4 +1,23 @@
 const sharp = require("sharp");
+require('dotenv').config();
+const AWS = require('aws-sdk');
+
+// S3 setup
+const bucketName = "A2_ImageStore";
+const s3 = new AWS.S3({ apiVersion: "2006-03-01" });
+
+s3.createBucket({ Bucket: bucketName })
+.promise()
+.then(() => console.log(`Created bucket: ${bucketName}`))
+.catch((err) => {
+    // We will ignore 409 errors which indicate that the bucket already exists
+    if (err.statusCode !== 409) {
+        console.log(`Error creating bucket: ${err}`);
+    }
+});
+
+
+
 
 const photoEdit = (req, res, next) => {
   var files = req.files.photos;
@@ -9,7 +28,7 @@ const photoEdit = (req, res, next) => {
     files = [files];
   }
 
-  // const saved = req.saved;
+  const saved = req.saved;
   const processing = req.query.processing;
   const photos = [];
 
@@ -150,16 +169,38 @@ const photoEdit = (req, res, next) => {
     });
   }
 
-  function uploadRedis(hash) {
+  // function uploadRedis(hash) {
+  //   redisClient.setEx(
 
-  }
+  //   )
+  // }
 
   function uploadS3(hash) {
-
+    const s3Key = ``;
+    const buffer = ``;
+    const objectParams = { Bucket: bucketName, Key: s3Key, Body: buffer}
+    s3.putObject(objectParams)
+    .promise()
+    .then(() => {
+      console.log(
+          `Successfully uploaded data to ${bucketName}/${s3Key}`
+      );
+    })
+    .catch((err) => {
+        console.log(err,err.stack);
+    });
   }
 
   function getS3(hash) {
-
+    const params = { Bucket: bucketName, Key: s3Key }
+    s3.getObject(params)
+    .promise()
+    .then((result) => {
+      return result
+    })
+    .catch((err) => {
+      console.log(err,err.stack)
+    })
   }
 };
 

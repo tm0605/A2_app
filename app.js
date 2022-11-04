@@ -8,6 +8,7 @@ const fileUpload = require("express-fileupload");
 const fileExists = require("./middleware/fileExists");
 const photoEdit = require("./middleware/photoEdit");
 const base64Conversion = require("./middleware/base64Conversion");
+const checkRedis = require("./middleware/checkRedis");
 const { type } = require("os");
 // var indexRouter = require('./routes/index');
 // var usersRouter = require('./routes/users');
@@ -40,6 +41,7 @@ app.post(
   "/upload",
   fileUpload({ createParentPath: true }),
   fileExists,
+  // checkRedis,
   photoEdit,
   base64Conversion,
   (req, res) => {

@@ -6,3 +6,18 @@ body {
 a {
   color: #00B7FF;
 }
+
+.inline{
+  display: inline-block;
+  border: 2px solid;
+  text-align: center;
+  margin: 1%;
+}
+#imagelist{
+  text-align: center;
+}
+
+.center{
+  text-align: center;
+  margin: 5% 0;
+}

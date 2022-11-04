@@ -9,6 +9,7 @@ const photoEdit = (req, res, next) => {
     files = [files];
   }
 
+  const saved = req.saved;
   const processing = req.query.processing;
   const photos = [];
 
@@ -148,6 +149,18 @@ const photoEdit = (req, res, next) => {
         resolve();
       }
     });
+  }
+
+  function uploadRedis(hash) {
+
+  }
+
+  function uploadS3(hash) {
+
+  }
+
+  function getS3(hash) {
+
   }
 };
 

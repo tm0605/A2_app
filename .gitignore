@@ -11,3 +11,4 @@ logs
 *.logs
 npm-debug.log*
 images/
+credTest.js

@@ -10,8 +10,6 @@ const photoEdit = require("./middleware/photoEdit");
 const base64Conversion = require("./middleware/base64Conversion");
 const checkRedis = require("./middleware/checkRedis");
 const { type } = require("os");
-// var indexRouter = require('./routes/index');
-// var usersRouter = require('./routes/users');
 // var uploadRouter = require('./routes/upload');
 
 var app = express();
@@ -26,17 +24,12 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-// app.use('/', indexRouter);
-// app.use('/users', usersRouter);
+// Frontend
 app.get("/resize", function (req, res) {
   res.sendFile(__dirname + "/views/resize.html");
 });
 
-/* app.get('/resizesingle', function(req, res) {
-  res.sendFile(__dirname + '/views/resizeSingle.html')
-}) */
-
-// app.use('/upload', uploadRouter);
+// Backend
 app.post(
   "/upload",
   fileUpload({ createParentPath: true }),
@@ -49,6 +42,7 @@ app.post(
     return res.json({ status: "logged", message: req.b64Photos });
   }
 );
+// app.use('/upload', uploadRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

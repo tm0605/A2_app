@@ -4,11 +4,11 @@ const base64Conversion = (req, res, next) => {
 
   convLoop(bufPhotos) // Convert all photos
     .then(() => {
-      req.b64Photos = b64Photos;
+      req.b64Photos = b64Photos; // Assign to req
       next()
     });
 
-  function convLoop(photoset) {
+  function convLoop(photoset) { // Loop function
     return new Promise((resolve, reject) => {
       for (let n = 0; n < photoset.length; ++n) {
         b64Conv(photoset[n]).then(() => {
@@ -20,7 +20,7 @@ const base64Conversion = (req, res, next) => {
     });
   }
 
-  function b64Conv(photo) {
+  function b64Conv(photo) { // Main conversion function
     return new Promise((resolve, reject) => {
       var b64Photo = photo.toString("base64");
       b64Photos.push(b64Photo);

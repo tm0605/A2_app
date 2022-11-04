@@ -96,19 +96,42 @@ const checkRedis = (req, res, next) => {
         }
 
         for (let n = 0; n < files.length; ++n) {
-          var hash = files[n].md5;
-          var redisKey = processing + "_" + hash;
-          console.log(`${redisKey} uploaded to redis`);
-          redisClient.setEx(
-            redisKey,
-            3600,
-            redisKey
-          )
-          .then(() => {
+          if (processing != 'all' && !saved[n]) {
+            var hash = files[n].md5;
+            var redisKey = processing + "_" + hash;
+            console.log(`${redisKey} uploaded to redis`);
+            redisClient.setEx(
+              redisKey,
+              3600,
+              redisKey
+            )
+            .then(() => {
+              if (n == files.length - 1 && p == processes.length - 1) {
+                resolve();
+              }
+            })
+          }
+          else if (processing == 'all' && !saved[p * files.length + n]) {
+            console.log(p * files.length + n)
+            var hash = files[n].md5;
+            var redisKey = processing + "_" + hash;
+            console.log(`${redisKey} uploaded to redis`);
+            redisClient.setEx(
+              redisKey,
+              3600,
+              redisKey
+            )
+            .then(() => {
+              if (n == files.length - 1 && p == processes.length - 1) {
+                resolve();
+              }
+            })
+          }
+          else {
             if (n == files.length - 1 && p == processes.length - 1) {
               resolve();
             }
-          })
+          }
         }
       }
     })

@@ -31,12 +31,15 @@ const sendFiles = async () => {
   // img.src = `data:image/jpeg;base64,${json?.message[0]}`
 
   for (let n = 0; n < json?.message.length; ++n) {
+    const imglist = document.getElementById("imagelist");
+    const span = document.createElement("div");
+    let image = imglist.appendChild(span);
     // const img = document.createElement('img');
-    const img = new Image(500); // Create image
+    const img = new Image(300); // Create image
     img.src = `data:image/jpeg;base64,${json?.message[n]}`;
-    document.body.append(img); // Append in html
+    // document.body.append(img); // Append in html
     const newLine = document.createElement("br");
-    document.body.append(newLine);
+    // document.body.append(newLine);
     const button = document.createElement("button"); // Add Download button under each photo
     button.setAttribute("type", "submit");
     button.textContent = "Download";
@@ -56,7 +59,8 @@ const sendFiles = async () => {
       },
       false
     );
-    document.body.append(button); // Append in html
+    image.appendChild(img);
+    image.append(button); // Append in html
     document.body.append(newLine);
   }
 

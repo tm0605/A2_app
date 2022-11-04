@@ -1,14 +1,14 @@
 const redis = require("redis");
+
+// Redis setup
 const redisClient = redis.createClient(/* {
   url: "redis://cab432a2image-001.km2jzi.0001.apse2.cache.amazonaws.com:6379",
 } */);
-
 redisClient.connect();
 
 redisClient.on("connect", function () {
   console.log("redis connected");
 });
-
 redisClient.on("error", (err) => {
   console.log("Error " + err);
 });
@@ -18,8 +18,8 @@ const checkRedis = (req, res, next) => {
   var files = req.files.photos;
   var processing = req.query.processing;
 
+  // If single photo add it in an array
   if (!(files instanceof Array)) {
-    // If single photo add it in an array
     files = [files];
   }
 
@@ -28,10 +28,10 @@ const checkRedis = (req, res, next) => {
   console.log('checking redis...');
   var found = 0;
   var missing = 0
-  scan(processing, files)
+  scan(processing, files) // Scan images in redis
   .then(() => {
-    req.saved = saved;
-    add(processing, files)
+    req.saved = saved; // Assign results to req
+    add(processing, files) // Set keys to redis
     .then(() => {
       next();
     })
@@ -41,33 +41,32 @@ const checkRedis = (req, res, next) => {
     return new Promise((resolve, reject) => {
       
       const processes = ['greyscale', 'resize', 'sharpen', 'blur'];
-      for (let p = 0; p < processes.length; ++p) {
-        if (processing != 'all' && p == 0) {
+      for (let p = 0; p < processes.length; ++p) { // Loop for the number of processes
+        if (processing != 'all' && p == 0) { // If its not all, loop once
           p = processes.length - 1;
         }
-        else {
+        else { // Assign process to processing
           processing = processes[p];
         }
-        for (let n = 0; n < files.length; ++n) {
+        for (let n = 0; n < files.length; ++n) { // Loop for the number of images
           var hash = files[n].md5;
           var redisKey = processing + "_" + hash;
           // console.log("redisKey: ", redisKey);
           redisClient
-          .get(redisKey)
+          .get(redisKey) // Attempt to retrieve from redis
           .then((result) => {
-            //Redisから引っ張ってくる
-            if (result) {
+            if (result) { // If found
               console.log(`image ${n}: ${result}`);
               found++;
-              saved.push(true);
-            } else {
+              saved.push(true); // Append true result
+            } else { // If not found
               console.log(`image ${n}: not found`);
               missing++;
-              saved.push(false);
+              saved.push(false); // Append false result
             }
           })
           .then(() => {
-            if (n == files.length - 1 && p == processes.length - 1) {
+            if (n == files.length - 1 && p == processes.length - 1) { // If last image of last process
               console.log('redis check done');
               console.log(`found: ${found} missing: ${missing}`)
               
@@ -86,50 +85,50 @@ const checkRedis = (req, res, next) => {
     return new Promise((resolve, reject) => {
       
       const processes = ['greyscale', 'resize', 'sharpen', 'blur'];
-      for (let p = 0; p < processes.length; ++p) {
-        if (processing != 'all' && p == 0) {
+      for (let p = 0; p < processes.length; ++p) { // Loop for the number of processes
+        if (processing != 'all' && p == 0) { // If not all process loop once
           p = processes.length - 1;
         }
-        else {
+        else { // Assign process to processing
           processing = processes[p];
           // console.log(processing);
         }
 
-        for (let n = 0; n < files.length; ++n) {
-          if (processing != 'all' && !saved[n]) {
+        for (let n = 0; n < files.length; ++n) { // Loop for the number of images
+          if (processing != 'all' && !saved[n]) { // If the process is not all and not saved
             var hash = files[n].md5;
             var redisKey = processing + "_" + hash;
             console.log(`${redisKey} uploaded to redis`);
-            redisClient.setEx(
+            redisClient.setEx( // Set key to redis
               redisKey,
               3600,
               redisKey
             )
             .then(() => {
-              if (n == files.length - 1 && p == processes.length - 1) {
-                resolve();
+              if (n == files.length - 1 && p == processes.length - 1) { // If last image of the last process
+                resolve(); // End
               }
             })
           }
-          else if (processing == 'all' && !saved[p * files.length + n]) {
+          else if (processing == 'all' && !saved[p * files.length + n]) { // If the process is all and not saved
             console.log(p * files.length + n)
             var hash = files[n].md5;
             var redisKey = processing + "_" + hash;
             console.log(`${redisKey} uploaded to redis`);
-            redisClient.setEx(
+            redisClient.setEx( // Set key to redis
               redisKey,
               3600,
               redisKey
             )
             .then(() => {
-              if (n == files.length - 1 && p == processes.length - 1) {
-                resolve();
+              if (n == files.length - 1 && p == processes.length - 1) { // If last image of the last process
+                resolve(); // End
               }
             })
           }
           else {
-            if (n == files.length - 1 && p == processes.length - 1) {
-              resolve();
+            if (n == files.length - 1 && p == processes.length - 1) { // If last image of the last process
+              resolve(); // End
             }
           }
         }

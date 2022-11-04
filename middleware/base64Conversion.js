@@ -12,8 +12,8 @@ const base64Conversion = (req, res, next) => {
     return new Promise((resolve, reject) => {
       for (let n = 0; n < photoset.length; ++n) {
         b64Conv(photoset[n]).then(() => {
-          if (n == photoset.length - 1) {
-            resolve();
+          if (n == photoset.length - 1) { // If last image
+            resolve(); // End
           }
         });
       }
@@ -23,8 +23,8 @@ const base64Conversion = (req, res, next) => {
   function b64Conv(photo) { // Main conversion function
     return new Promise((resolve, reject) => {
       var b64Photo = photo.toString("base64");
-      b64Photos.push(b64Photo);
-      resolve();
+      b64Photos.push(b64Photo); // Append to array
+      resolve(); // End
     });
   }
 };

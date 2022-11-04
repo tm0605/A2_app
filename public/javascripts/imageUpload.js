@@ -34,7 +34,7 @@ const sendFiles = async () => {
     formData.append("photos", files.item(key));
   });
 
-  const response = await fetch(`/upload?processing=${processing}`, {
+  const response = await fetch(`/upload?processing=${processing}`, { // Fetch data from backend
     method: "POST",
     body: formData,
   });
@@ -54,7 +54,7 @@ const sendFiles = async () => {
   // const img = document.querySelector('img')
   // img.src = `data:image/jpeg;base64,${json?.message[0]}`
 
-  for (let n = 0; n < json?.message.length; ++n) {
+  for (let n = 0; n < json?.message.length; ++n) { // Creage image content for the number of images
     const imglist = document.getElementById("imagelist");
     const div = document.createElement("div");
     div.className = "inline";

@@ -39,7 +39,7 @@ app.post(
   base64Conversion,
   (req, res) => {
     // console.log(req.photos);
-    return res.json({ status: "logged", message: req.b64Photos });
+    return res.json({ status: "Success", message: req.b64Photos });
   }
 );
 // app.use('/upload', uploadRouter);

@@ -105,10 +105,11 @@ const checkRedis = (req, res, next) => {
               redisKey
             )
             .then(() => {
-              x++;
               if (x == files.length * pn - 1) { // If last image of the last process
+                
                 resolve(); // End
               }
+              x++;
             })
           }
           else if (proc == 'all' && !saved[p * files.length + n]) { // If the process is all and not saved
@@ -121,17 +122,17 @@ const checkRedis = (req, res, next) => {
               redisKey
             )
             .then(() => {
-              x++;
               if (x == files.length * pn - 1) { // If last image of the last process
                 resolve(); // End
               }
+              x++;
             })
           }
           else { // Already saved
-            x++;
             if (x == files.length * pn - 1) { // If last image of the last process
               resolve(); // End
             }
+            x++;
           }
         }
       }

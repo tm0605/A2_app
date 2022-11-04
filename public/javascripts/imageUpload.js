@@ -43,7 +43,7 @@ const sendFiles = async () => {
   let timing = Date.now() - start;
 
   const h2 = document.querySelector("h2");
-  h2.textContent = `Status: ${json?.status}`;
+  h2.textContent = `${json?.status}`;
 
   // const h3 = document.querySelector('h3')
   // h3.textContent = json?.message
@@ -60,7 +60,7 @@ const sendFiles = async () => {
     div.className = "inline";
     let image = imglist.appendChild(div);
     // const img = document.createElement('img');
-    const img = new Image(250); // Create image
+    const img = new Image(300); // Create image
     img.src = `data:image/jpeg;base64,${json?.message[n]}`;
     // document.body.append(img); // Append in html
     // const newLine = document.createElement("br");

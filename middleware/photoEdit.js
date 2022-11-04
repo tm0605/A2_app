@@ -3,7 +3,7 @@ require('dotenv').config();
 const AWS = require('aws-sdk');
 
 // S3 setup
-const bucketName = "a2-imagestore";
+const bucketName = "n10241621-a2-imagestore";
 const s3 = new AWS.S3({ apiVersion: "2006-03-01" });
 
 s3.createBucket({ Bucket: bucketName })

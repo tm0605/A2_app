@@ -9,18 +9,18 @@ const photoEdit = (req, res, next) => {
     files = [files];
   }
 
-  const saved = req.saved;
+  // const saved = req.saved;
   const processing = req.query.processing;
   const photos = [];
 
   greyscale(files).then(() => {
-    
+
     resizeHalf(files).then(() => {
 
       sharpen(files).then(() => {
-        
-        blur(files).then(() => {
 
+        blur(files).then(() => {
+          
           req.editedPhotos = photos;
           next();
         });
@@ -31,7 +31,6 @@ const photoEdit = (req, res, next) => {
   function greyscale(photoset) {
     return new Promise((resolve, reject) => {
       if (processing == 'all' || processing == 'greyscale') {
-
         let start = Date.now();
         console.log("starting greyscale processing");
         // console.log(photoset)

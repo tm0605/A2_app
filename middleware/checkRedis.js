@@ -1,9 +1,9 @@
 const redis = require("redis");
 
 // Redis setup
-const redisClient = redis.createClient(/* {
+const redisClient = redis.createClient({
   url: "redis://cab432a2image-001.km2jzi.0001.apse2.cache.amazonaws.com:6379",
-} */);
+});
 redisClient.connect();
 
 redisClient.on("connect", function () {

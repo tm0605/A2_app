@@ -41,7 +41,7 @@ app.post(
   "/upload",
   fileUpload({ createParentPath: true }),
   fileExists,
-  // checkRedis,
+  checkRedis,
   photoEdit,
   base64Conversion,
   (req, res) => {

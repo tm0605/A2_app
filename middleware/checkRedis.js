@@ -102,7 +102,7 @@ const checkRedis = (req, res, next) => {
           redisClient.setEx(
             redisKey,
             3600,
-            hash
+            redisKey
           )
           .then(() => {
             if (n == files.length - 1 && p == processes.length - 1) {

@@ -31,17 +31,34 @@ const photoEdit = (req, res, next) => {
   const saved = req.saved;
   // console.log(saved)
   const processing = req.query.processing;
-  const photos = [];
+  var photos = [];
+  const output = [];
 
   greyscale().then(() => { // Greyscale process
+    for (let n = 0; n < photos.length; ++n) {
+      output.push(photos[n])
+    }
+    photos = [];
 
     resizeHalf().then(() => { // Resize process
+      for (let n = 0; n < photos.length; ++n) {
+        output.push(photos[n])
+      }
+      photos = [];
 
       sharpen().then(() => { // Sharpen process
+        for (let n = 0; n < photos.length; ++n) {
+          output.push(photos[n])
+        }
+        photos = [];
 
         blur().then(() => { // Blur process
+          for (let n = 0; n < photos.length; ++n) {
+            output.push(photos[n])
+          }
+          photos = [];
           
-          req.editedPhotos = photos; // Assign to req
+          req.editedPhotos = output; // Assign to req
           next();
         });
       });
@@ -63,7 +80,7 @@ const photoEdit = (req, res, next) => {
             getS3('greyscale', n) // Serve from s3
             .then((result) => {
               photos.push(result); // Append to array
-              if (n == files.length - 1) { // If last image
+              if (photos.length == files.length) { // If last image
                 let time = Date.now() - start;
                 console.log(`greyscale processing: ${time}ms`);
                 resolve(); // End
@@ -79,7 +96,7 @@ const photoEdit = (req, res, next) => {
               uploadS3('greyscale', data, n) // Upload to s3
               .then(() => {
                 photos.push(data); // Append to array
-                if (n == files.length - 1) { // If last image
+                if (photos.length == files.length) { // If last image
                   let time = Date.now() - start;
                   console.log(`greyscale processing: ${time}ms`);
                   resolve(); // End
@@ -113,7 +130,7 @@ const photoEdit = (req, res, next) => {
             getS3('resize', n) // Serve from s3
             .then((result) => {
               photos.push(result); // Append to array
-              if (n == files.length - 1) { // If last image
+              if (photos.length == files.length) { // If last image
                 let time = Date.now() - start;
                 console.log(`resize half processing: ${time}ms`);
                 resolve(); // End
@@ -130,7 +147,7 @@ const photoEdit = (req, res, next) => {
                 uploadS3('resize', data, n) // Upload to s3
                 .then(() => {
                   photos.push(data); // Append to array
-                  if (n == files.length - 1) { // If last image
+                  if (photos.length == files.length) { // If last image
                     let time = Date.now() - start;
                     console.log(`resize half processing: ${time}ms`);
                     resolve(); // End
@@ -166,7 +183,7 @@ const photoEdit = (req, res, next) => {
             getS3('sharpen', n) // Serve from s3
             .then((result) => {
               photos.push(result); // Append to array
-              if (n == files.length - 1) { // If last image
+              if (photos.length == files.length) { // If last image
                 let time = Date.now() - start;
                 console.log(`sharpen processing: ${time}ms`);
                 resolve(); // End
@@ -182,7 +199,7 @@ const photoEdit = (req, res, next) => {
               uploadS3('sharpen', data, n) // Upload to s3
               .then(() => {
                 photos.push(data); // Append to array
-                if (n == files.length - 1) { // If last image
+                if (photos.length == files.length) { // If last image
                   let time = Date.now() - start;
                   console.log(`sharpen processing: ${time}ms`);
                   resolve(); // End
@@ -217,7 +234,7 @@ const photoEdit = (req, res, next) => {
             getS3('blur', n) // Serve from s3
             .then((result) => {
               photos.push(result); // Append to array
-              if (n == files.length - 1) { // If last image
+              if (photos.length == files.length) { // If last image
                 let time = Date.now() - start;
                 console.log(`blur processing: ${time}ms`);
                 resolve(); // End
@@ -233,7 +250,7 @@ const photoEdit = (req, res, next) => {
               uploadS3('blur', data, n) // Upload to s3
               .then(() => {
                 photos.push(data); // Append to array
-                if (n == files.length - 1) { // If last image
+                if (photos.length == files.length) { // If last image
                   let time = Date.now() - start;
                   console.log(`blur processing: ${time}ms`);
                   resolve(); // End

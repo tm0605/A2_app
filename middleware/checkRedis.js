@@ -28,10 +28,10 @@ const checkRedis = (req, res, next) => {
   console.log('checking redis...');
   var found = 0;
   var missing = 0
-  scan(processing, files) // Scan images in redis
+  scan(processing) // Scan images in redis
   .then(() => {
     req.saved = saved; // Assign results to req
-    add(processing, files) // Set keys to redis
+    add(processing) // Set keys to redis
     .then(() => {
       next();
     })
@@ -44,9 +44,11 @@ const checkRedis = (req, res, next) => {
       for (let p = 0; p < processes.length; ++p) { // Loop for the number of processes
         if (processing != 'all' && p == 0) { // If its not all, loop once
           p = processes.length - 1;
+          var pn = 1;
         }
         else { // Assign process to processing
           processing = processes[p];
+          var pn = processes.length;
         }
         for (let n = 0; n < files.length; ++n) { // Loop for the number of images
           var hash = files[n].md5;
@@ -64,34 +66,32 @@ const checkRedis = (req, res, next) => {
               missing++;
               saved.push(false); // Append false result
             }
-          })
-          .then(() => {
-            if (n == files.length - 1 && p == processes.length - 1) { // If last image of last process
+            if (saved.length == files.length * pn) { // If last image of last process
               console.log('redis check done');
               console.log(`found: ${found} missing: ${missing}`)
               
               resolve();
             }
-          });
+          })
         }
-        
       }
-      
     })
-    
   }
 
   function add(processing) {
     return new Promise((resolve, reject) => {
-      
+      var x = 0; // counter
+      var pn, proc;
       const processes = ['greyscale', 'resize', 'sharpen', 'blur'];
       for (let p = 0; p < processes.length; ++p) { // Loop for the number of processes
         if (processing != 'all' && p == 0) { // If not all process loop once
           p = processes.length - 1;
+          pn = 1; // Only one process
         }
         else { // Assign process to processing
+          proc = 'all';
           processing = processes[p];
-          // console.log(processing);
+          pn = processes.length; // Four process
         }
 
         for (let n = 0; n < files.length; ++n) { // Loop for the number of images
@@ -105,13 +105,13 @@ const checkRedis = (req, res, next) => {
               redisKey
             )
             .then(() => {
-              if (n == files.length - 1 && p == processes.length - 1) { // If last image of the last process
+              x++;
+              if (x == files.length * pn - 1) { // If last image of the last process
                 resolve(); // End
               }
             })
           }
-          else if (processing == 'all' && !saved[p * files.length + n]) { // If the process is all and not saved
-            console.log(p * files.length + n)
+          else if (proc == 'all' && !saved[p * files.length + n]) { // If the process is all and not saved
             var hash = files[n].md5;
             var redisKey = processing + "_" + hash;
             console.log(`${redisKey} uploaded to redis`);
@@ -121,13 +121,15 @@ const checkRedis = (req, res, next) => {
               redisKey
             )
             .then(() => {
-              if (n == files.length - 1 && p == processes.length - 1) { // If last image of the last process
+              x++;
+              if (x == files.length * pn - 1) { // If last image of the last process
                 resolve(); // End
               }
             })
           }
-          else {
-            if (n == files.length - 1 && p == processes.length - 1) { // If last image of the last process
+          else { // Already saved
+            x++;
+            if (x == files.length * pn - 1) { // If last image of the last process
               resolve(); // End
             }
           }

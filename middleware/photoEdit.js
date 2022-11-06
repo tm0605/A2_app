@@ -86,6 +86,26 @@ const photoEdit = (req, res, next) => {
                 resolve(); // End
               }
             })
+            .catch((err) => {
+              const image = sharp(files[n].data); // Process image
+              image
+              .greyscale()
+              .toBuffer()
+              .then((data) => {
+                uploadS3('greyscale', data, n) // Upload to s3
+                .then(() => {
+                  photos.push(data); // Append to array
+                  if (photos.length == files.length) { // If last image
+                    let time = Date.now() - start;
+                    console.log(`greyscale processing: ${time}ms`);
+                    resolve(); // End
+                  }
+                })
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+            })
           }
           else { // If not saved
             const image = sharp(files[n].data); // Process image
@@ -135,6 +155,28 @@ const photoEdit = (req, res, next) => {
                 console.log(`resize half processing: ${time}ms`);
                 resolve(); // End
               }
+            })
+            .catch(() => {
+              const image = sharp(files[n].data); // Process image
+              image.metadata().then(({ width }) => {
+                image
+                .resize(Math.round(width * 0.5))
+                .toBuffer()
+                .then((data) => {
+                  uploadS3('resize', data, n) // Upload to s3
+                  .then(() => {
+                    photos.push(data); // Append to array
+                    if (photos.length == files.length) { // If last image
+                      let time = Date.now() - start;
+                      console.log(`resize half processing: ${time}ms`);
+                      resolve(); // End
+                    }
+                  })
+                })
+                .catch((error) => {
+                  console.log(error);
+                });
+              });
             })
           }
           else { // If not saved
@@ -189,6 +231,26 @@ const photoEdit = (req, res, next) => {
                 resolve(); // End
               }
             })
+            .catch(() => {
+              const image = sharp(files[n].data); // Process image
+              image
+              .sharpen({ sigma: 20 })
+              .toBuffer()
+              .then((data) => {
+                uploadS3('sharpen', data, n) // Upload to s3
+                .then(() => {
+                  photos.push(data); // Append to array
+                  if (photos.length == files.length) { // If last image
+                    let time = Date.now() - start;
+                    console.log(`sharpen processing: ${time}ms`);
+                    resolve(); // End
+                  }
+                })
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+            })
           }
           else { // If not saved
             const image = sharp(files[n].data); // Process image
@@ -239,6 +301,26 @@ const photoEdit = (req, res, next) => {
                 console.log(`blur processing: ${time}ms`);
                 resolve(); // End
               }
+            })
+            .catch(() => {
+              const image = sharp(files[n].data); // Process image
+              image
+              .blur(20)
+              .toBuffer()
+              .then((data) => {
+                uploadS3('blur', data, n) // Upload to s3
+                .then(() => {
+                  photos.push(data); // Append to array
+                  if (photos.length == files.length) { // If last image
+                    let time = Date.now() - start;
+                    console.log(`blur processing: ${time}ms`);
+                    resolve(); // End
+                  }
+                })
+              })
+              .catch((error) => {
+                console.log(error);
+              });
             })
           }
           else { // If not saved
